@@ -1,0 +1,81 @@
+Pruebas FLAGS OPERADOR
+./agente
+./agente -s A1
+./agente -a archivo.csv
+./agente -p pipe1
+./agente -s A1 -a sol.csv -p pipe1
+
+Pruebas FLAGS OPERADOR ARGUMENTOS
+./agente -s 0123456789012345678901234567891 -a sol.csv -p pipe1
+./agente -s 01234567890123456789012345678912 -a sol.csv -p pipe1
+./agente -s A1 -a sol.csv -p 012345678901234567890123456789012345678901234567890123456789012
+./agente -s A1 -a sol.csv -p 0123456789012345678901234567890123456789012345678901234567890123
+./agente -s A1 -a 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123 -p pipe1
+./agente -s A1 -a 0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234 -p pipe1
+
+Pruebas FLAGS OPERADOR ARGUMENTOS ARCHIVO
+"Prueba con archivo inexistente"
+./agente -s A1 -a noExiste.csv -p pipeCtrl
+"Prueba con archivo existente"
+./agente -s A1 -a solicitudes.csv -p pipeCtrl
+
+Pruebas FLAGS OPERADOR ARGUMENTOS SINCRONIZACION
+"Prueba con pipe que no coincide con el controlador"
+./agente -s A1 -a solicitudes.csv -p pipeNoCoincide
+"Prueba con pipe que coincide con el controlador"
+./agente -s A1 -a solicitudes.csv -p pipeCtrl
+
+Pruebas FLAGS OPERADOR
+./controlador
+./controlador -i 8
+./controlador -f 15
+./controlador -s 5
+./controlador -t 20
+./controlador -p pipeCtrl
+./controlador -i 8 -f 15 -s 5 -t 20 -p pipeCtrl
+
+Pruebas FLAGS OPERADOR limites
+./controlador -i 6 -f 15 -s 5 -t 20 -p pipeCtrl
+./controlador -i 20 -f 15 -s 5 -t 20 -p pipeCtrl
+./controlador -i 8 -f 6 -s 5 -t 20 -p pipeCtrl
+./controlador -i 8 -f 20 -s 5 -t 20 -p pipeCtrl
+./controlador -i 8 -f 15 -s 0 -t 20 -p pipeCtrl
+./controlador -i 8 -f 15 -s 5 -t 0 -p pipeCtrl
+
+Pruebas de sincronizacion
+- Ejecucion simple:
+	./controlador -i 8 -f 15 -s 5 -t 20 -p pipeCtrl 
+	./agente -s agente1 -a solicitudes1.csv -p pipeCtrl 
+
+- Ejecución con dos agentes desde el inicio 
+
+	./controlador -i 8 -f 15 -s 5 -t 20 -p pipeCtrl 
+	./agente -s agente1 -a solicitudes1.csv -p pipeCtrl 
+	"Antes de que el controlador pase a la siguiente hora ejecutar el siguiente comando"
+	./agente -s agente2 -a solicitudes2.csv -p pipeCtrl 
+
+- Ejecución con dos agentes, después de un tiempo se ejecuta el segundo 
+
+	./controlador -i 8 -f 15 -s 5 -t 20 -p pipeCtrl 
+	./agente -s agente1 -a solicitudes1.csv -p pipeCtrl 
+	"Esperar que al menos pase 1 hora en el controlador para ajcutar el siguiente comando"
+	./agente -s agente2 -a solicitudes2.csv -p pipeCtrl 
+
+Pruebas de reprogramacion y denegacion
+- Reprogramación a un solo agente:
+	./controlador -i 8 -f 15 -s 5 -t 10 -p pipeCtrl
+	./agente -s agente1 -a solicitudes1.csv -p pipeCtrl 
+
+- Denegación a un agente debido a que se supera el aforo 
+	./controlador -i 8 -f 15 -s 5 -t 9 -p pipeCtrl
+	./agente -s agente1 -a solicitudes1.csv -p pipeCtrl 
+
+- Reprogramación a un agente debido a otro agente 
+	./controlador -i 8 -f 15 -s 5 -t 10 -p pipeCtrl 
+	./agente -s agente1 -a solicitudes1.csv -p pipeCtrl 
+	"Antes de que el controlador pase a la siguiente hora ejecutar el siguiente comando"
+	./agente -s agente2 -a solicitudes2.csv -p pipeCtrl 
+
+Prueba de reporte final
+./controlador -i 7 -f 19 -s 5 -t 10 -p pipeCtrl 
+./agente -s agente1 -a solicitudGrande.csv -p pipeCtrl 
